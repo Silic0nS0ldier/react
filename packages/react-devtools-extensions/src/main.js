@@ -233,22 +233,12 @@ function createPanelIfReactLoaded() {
             bridge.send('viewElementSource', {id, rendererID});
 
             setTimeout(() => {
-              // Ask Chrome to display the location of the component function,
-              // or a render method if it is a Class (ideally Class instance, not type)
-              // assuming the renderer found one.
+              // Ask Chrome to display the location of the component declaration.
+              // NOTE Class components not defined with `class` sugar or downlevel compiled may
+              //      have declaration sites in helpers or library code.
               chrome.devtools.inspectedWindow.eval(`
                 if (window.$type != null) {
-                  if (
-                    window.$type &&
-                    window.$type.prototype &&
-                    window.$type.prototype.isReactComponent
-                  ) {
-                    // inspect Component.render, not constructor
-                    inspect(window.$type.prototype.render);
-                  } else {
-                    // inspect Functional Component
-                    inspect(window.$type);
-                  }
+                  inspect(window.$type);
                 }
               `);
             }, 100);
